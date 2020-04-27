@@ -9,6 +9,7 @@ var listeners = {
 document.getElementById('control_people_speed').addEventListener('change', function (e) {
     let inputPeopleSpeed = this.value;
     maxVelocity = inputPeopleSpeed * 6 / 100;
+    document.getElementById('control_people_speed_text').innerHTML = Math.round(inputPeopleSpeed);
 });
 
 /* Initial population */
@@ -17,7 +18,7 @@ document.getElementById('control_initial_population').addEventListener('change',
     inputInitialPopulation = this.value;
     if (inputInitialPopulation > MAX_INITIAL_POPULATION) {
         this.value = initialPopulation;
-        alert('The number is too high. Maximum value for initial population is ' + MAX_INITIAL_POPULATION);
+        alert('O número é muito alto. Valor máximo para a população inicial é ' + MAX_INITIAL_POPULATION);
     } else {
         initialPopulation = inputInitialPopulation;
         statistics.totalPeople = initialPopulation;
@@ -32,7 +33,7 @@ document.getElementById('control_initial_population').addEventListener('change',
 document.getElementById('control_initial_infected').addEventListener('change', function (e) {
     inputInitialInfected = parseInt(this.value);
     if (inputInitialInfected > initialPopulation) {
-        alert('Number of infected must be lower than the number of total people');
+        alert('O número de infectados deve ser menor que o número total de pessoas');
         this.value = initialInfected;
     } else {
         initialInfected = inputInitialInfected;
@@ -59,7 +60,7 @@ document.getElementById('control_lethality_rate').addEventListener('input', func
 });
 
 /* Quarantine activation */
-document.getElementById('control_quarantine').addEventListener('input', function (e) {
+document.getElementById('check-quarantine').addEventListener('input', function (e) {
     quarantineActivated = this.checked;
 });
 
@@ -83,27 +84,37 @@ document.getElementById('control_intensive_care_rate').addEventListener('input',
 /* Intensive care beds every 100 people */
 document.getElementById('control_intensive_care_beds').addEventListener('change', listeners.intensiveCare);
 
-/* Button: stop simulation */
-document.getElementById('control_stop').addEventListener('click', function (e) {
-    stopSimulation();
+/* Button: reset simulation */
+document.getElementById('control_reset').addEventListener('click', function (e) {
+    resetSimulation();
     resetChart();
 });
 
 /* Button: start simulation */
 document.getElementById('control_start').addEventListener('click', function (e) {
-    stopSimulation();
+    isPaused=false;
+    resetSimulation();
     resetChart();
 
     document.getElementById('simulator').style.display = 'block';
-    // location.hash = "#simulator";
-    $([document.documentElement, document.body]).animate({
-        scrollTop: $("#simulator").offset().top
-    }, 1000);
+    location.hash = "#simulator";
 
     startSimulation();
     updateChart();
     updateChartInterval = setInterval(updateChart, 1000);
 });
+
+/* Button: pause simulation */
+document.getElementById('control_pause').addEventListener('click', function (e) {
+    pauseSimulation();
+});
+
+/* Button: resuming simulation */
+//document.getElementById('control_resuming').addEventListener('click', function (e) {
+//    resumingSimulation();
+//});
+
+
 
 /* Add a line to the graph whenever some parameter changes */
 // TODO: add Chart Annotation plugin: https://github.com/chartjs/Chart.js/issues/4495#issuecomment-315238365
@@ -124,14 +135,15 @@ document.getElementById('control_start').addEventListener('click', function (e) 
 // })
 
 /* Hide simulator before the first start of the simulation */
-document.getElementById('simulator').style.display = 'none';
+//document.getElementById('simulator').style.display = 'none';
 
 /* Set input of the form to the initial values */
 document.getElementById('control_initial_population').value = initialPopulation;
 
 document.getElementById('control_initial_infected').value = initialInfected;
 
-document.getElementById('control_people_speed').value = maxVelocity * 100 / 5;
+document.getElementById('control_people_speed').value = maxVelocity * 100 / 6;
+document.getElementById('control_people_speed_text').innerHTML = maxVelocity * 100 / 6;
 
 document.getElementById('control_infection_rate').value = infectionRate * 100;
 document.getElementById('control_infection_rate_text').innerText = infectionRate * 100;
@@ -141,7 +153,7 @@ document.getElementById('control_desease_duration').value = infectionDuration;
 document.getElementById('control_lethality_rate').value = lethalityRate * 100;
 document.getElementById('control_lethality_rate_text').innerHTML = lethalityRate * 100;
 
-document.getElementById('control_quarantine').checked = quarantineActivated;
+document.getElementById('check-quarantine').checked = quarantineActivated;
 
 document.getElementById('control_days_to_quarantine').value = daysBeforeSymphtoms;
 

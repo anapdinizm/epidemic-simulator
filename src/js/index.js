@@ -1,10 +1,10 @@
 var population_ID = 0;
 var person_ID = 0;
 var dailyCallInterval;
-var runningSimulation = false;
 var layer;
 var requestAnimationFrameCall;
 var timers = [];
+var isPaused=false;
 const CIRCLE_RADIUS = 5;
 
 class Person {
@@ -385,13 +385,8 @@ function getNewSpeed(currentSpeed) {
     return newSpeed;
 }
 
-function startSimulation() {
-    runningSimulation = true;
-
-    statistics.reset();
-
+function startSimulation() {    
     requestAnimationFrameCall = window.requestAnimationFrame(updateAnimationFrame);
-
     for (var i = 0; i < initialPopulation; i++) {
         var person = population.addPerson();
 
@@ -406,27 +401,52 @@ function startSimulation() {
     dailyCallInterval = setInterval(dailyCall, 1000);
 }
 
-function stopSimulation() {
-    statistics.reset();    
-    if (runningSimulation) {
-        population.clear();
-        clearInterval(dailyCallInterval);
-        cancelAnimationFrame(requestAnimationFrameCall);
-        timers.forEach(timer => {
-            if (timer) {
-                clearTimeout(timer);
-            }
-        });
+function resetSimulation() {
+    if (isPaused){
+        startSimulation();
     }
+    isPaused=false;
+    statistics.reset();    
+    //if (runningSimulation) {
+    population.clear();
+    clearInterval(dailyCallInterval);
+    cancelAnimationFrame(requestAnimationFrameCall);
+    timers.forEach(timer => {
+        if (timer) {
+            clearTimeout(timer);
+        }
+    });
+   // }
 }
+
+function pauseSimulation() {
+    isPaused=true;
+    clearInterval(dailyCallInterval);
+    clearInterval(updateChartInterval);
+    cancelAnimationFrame(updateAnimationFrame);
+    cancelAnimationFrame(requestAnimationFrameCall);
+    timers.forEach(timer => {
+        if (timer) {
+            clearTimeout(timer);
+        }
+    });
+}
+
+//function resumingSimulation() {
+//    requestAnimationFrameCall = requestAnimationFrame(updateAnimationFrame);
+//    updateChart();
+//    dailyCallInterval = setInterval(dailyCall, 1000);
+//    updateChartInterval = setInterval(updateChart, 1000);
+//}
 
 function updateAnimationFrame() {
     cancelAnimationFrame(requestAnimationFrameCall);
+    
     population.update();
-
+        
     layer.batchDraw();
     layer_quarantine.batchDraw();
-
+        
     requestAnimationFrameCall = requestAnimationFrame(updateAnimationFrame);
 }
 

@@ -5,38 +5,38 @@ var config = {
     data: {
         labels: [],
         datasets: [{
-            label: 'Intensive care',
+            label: 'Hospitalizados',
             backgroundColor: COLORS.circles.intensive_care.fill,
             borderColor: COLORS.circles.intensive_care.stroke,
             data: [],
-            fill: 'origin',
+            fill: 'false',//'origin'
         }, {
-            label: 'Infected',
+            label: 'Infectados',
             backgroundColor: COLORS.circles.infected.fill,
             borderColor: COLORS.circles.infected.stroke,
             data: [],
-            fill: '-1',
+            fill: 'false',//'-1'
         }, {
-            label: 'Healthy',
-            fill: 'end',
+            label: 'Saudáveis',
+            //fill: 'end',
             backgroundColor: COLORS.circles.healthy.fill,
             borderColor: COLORS.circles.healthy.stroke,
             data: [],
-            fill: '-1',
+            fill: 'false',//'-1'
         }, {
-            label: 'Cured',
-            fill: 'end',
-            backgroundColor: COLORS.circles.immune.fill,
+            label: 'Curados',
+            //fill: 'end',
+           backgroundColor: COLORS.circles.immune.fill,
             borderColor: COLORS.circles.immune.stroke,
             data: [],
-            fill: '-1',
+            fill: 'false',//'-1'
         }, {
-            label: 'Deaths',
-            fill: 'end',
+            label: 'Mortos',
+            //fill: 'end',
             backgroundColor: COLORS.circles.dead.fill,
             borderColor: COLORS.circles.dead.stroke,
             data: [],
-            fill: '-1',
+            fill: 'false',//'-1'
         }]
     },
     options: {
@@ -54,19 +54,19 @@ var config = {
                 display: true,
                 scaleLabel: {
                     display: true,
-                    labelString: 'Days'
+                    labelString: 'Dias'
                 }
             }],
             yAxes: [{
                 display: true,
                 scaleLabel: {
                     display: true,
-                    labelString: 'Number of people'
+                    labelString: 'Número de pessoas'
                 },
                 ticks: {
                     suggestedMax: initialPopulation,
                 },
-                stacked: true
+                //stacked: true
             }]
         },
         annotation: {
@@ -75,8 +75,8 @@ var config = {
     }
 };
 
-
 window.onload = function () {
+    statistics.reset()
     var ctx = document.getElementById('chart').getContext('2d');
     lineGraph = new Chart(ctx, config);
 };

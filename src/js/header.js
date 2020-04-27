@@ -1,20 +1,20 @@
 var COLORS = {
     circles: {
         healthy: {
-            fill: '#FFFFFF',
-            stroke: '#808080',
+            fill: '#B0E0E6',
+            stroke: '#B0E0E6',
         },
         intensive_care: {
-            fill: '#8c0000',
-            stroke: '#FF0000',
+            fill: '#DA70D6',
+            stroke: '#DA70D6',
         },
         infected: {
-            fill: '#FF0000',
-            stroke: '#FF0000',
+            fill: '#FA8072',
+            stroke: '#FA8072',
         },
         immune: {
-            fill: '#00FFE7',
-            stroke: '#005eff',
+            fill: '#6A5ACD',
+            stroke: '#6A5ACD',
         },
         dead: {
             fill: '#000000',
