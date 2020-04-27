@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simulador Epidêmico</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://anapdinizm.github.io/epidemic-simulator/src/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .bd-placeholder-img {
+          font-size: 1.125rem;
+          text-anchor: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+    
+        @media (min-width: 768px) {
+          .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+          }
+        }
+        .alert{
+          position:relative;
+          padding:.75rem 1.25rem;
+          margin-bottom:1rem;
+          border:1px solid transparent;
+          border-radius:.25rem
+          }
+        .alert-healed{
+          color:#004085;
+          background-color:#fefefe;
+          border-color:#fdfdfe
+          /*background-color:#cce5ff;
+          border-color:#b8daff*/
+          }
+        .alert-healed hr{border-top-color:#9fcdff}
+        .alert-infected{
+          color:#721c24;
+          background-color:#fefefe;
+          border-color:#fdfdfe
+          /*background-color:#f8d7da;
+          border-color:#f5c6cb*/
+          }
+        .alert-infected hr{border-top-color:#f1b0b7}
+        .alert-healthy{
+          color:#818182;
+          background-color:#fefefe;
+          border-color:#fdfdfe
+          }
+        .alert-healthy hr{border-top-color:#ececf6}
+        .alert-deaths{
+          color:#1b1e21;
+          background-color:#fefefe;
+          border-color:#fdfdfe
+          /*background-color:#d6d8d9;
+          border-color:#c6c8ca*/
+          }
+        .alert-deaths hr{border-top-color:#b9bbbe}
+        /**/
+        .checkmark {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 25px;
+          width: 25px;
+        }
+        .checkbox-quarantine {
+          position: relative;
+          padding-left: 25px;
+          margin-bottom: 12px;
+          cursor: pointer;
+          font-size: 16px;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+        .checkbox-quarantine input {
+            display: none;
+            }
+        .checkbox-quarantine span {
+            border: 3px solid #7e8a94;
+            float: left;
+            height: 20px;
+            width: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            }
+        /* Style the checkmark/indicator */
+        .checkbox-quarantine:hover span,
+        /* When the checkbox is checked, add a blue border and a blue background*/
+        .checkbox-quarantine input:checked + span {
+            border: 3px solid #7e8a94;/*#008B8B;*/
+            background-color: #7e8a94;
+            }
+        /* When the checkbox is checked*/
+        .checkbox-quarantine input:checked + span:before {
+          content: "✗"; /*"✔";*/
+        }
+    </style>
+  <!-- Custom styles for this template -->
+  <script src="https://unpkg.com/konva@4.2.2/konva.min.js"></script>
+  <script src="https://anapdinizm.github.io/epidemic-simulator/src/js/plugins/Chart.js"></script>
+</head>
+
+<body>
+    <main role="main" class="container mt-4">
+        <div id="simulator" class="mb-4">
+          <div class="row">
+            <!--<h1 data-translate="title">Simulador de uma Epidemia </h1> -->
+            <center>
+            <a href="https://anapdinizm.github.io/simulator/epidemic_simulator.html"> <h3>Simulador Epidêmico </h3> </a>
+            <br>
+            <small id="ref_code" class="form-text text-muted">
+                Código da simulação baseado no repositório de <a href="https://lucadibattista.it">Luca Dibattista</a>. Disponível no GitHub <a href="https://github.com/LucaDiba/epidemic-simulator"> neste link </a> sob <a href="https://www.gnu.org/licenses/gpl-3.0.html" >GNU General Public License v3.0</a>.
+            </small>
+            </center>
+          </div>
+          <br>
+          <center>
+          <button type="button" class="btn btn-secondary" id="control_reset" data-translate='reset_simulation'>Reset simulação</button>
+          <button type="button" class="btn btn-primary" id="control_start" data-translate='start_simulation'>Iniciar simulação</button>
+          <button type="button" class="btn btn-secondary" id="control_pause" data-translate='pause_simulation'>Pausar simulação</button>
+          <!-- <button type="button" class="btn btn-secondary" id="control_resuming" data-translate='resuming_simulation'>Continuar simulação</button> -->
+        </center>
+          <br>
+          <div class="row">
+            <div class="alert alert-infected border border-dark col-sm-3" role="alert">
+              <span id="total_infected"></span> <span data-translate="infected">Infectados</span><br>
+            </div>
+            <div class="alert alert-healthy border border-dark col-sm-3" role="alert">
+              <span id="total_healthy"></span> <span data-translate="healthy">Saudáveis</span><br>
+            </div>
+            <div class="alert alert-healed border border-dark col-sm-2" role="alert">
+              <span id="total_immune"></span> <span data-translate="cured">Curados</span><br>
+            </div>
+            <div class="alert alert-deaths border border-dark col-sm-4" role="alert">
+              <span id="total_dead"></span> <span data-translate="dead">Mortos</span><br>
+              <span data-translate="of_which">dos quais</span> <span id="total_dead_for_intensive_care"></span> <span data-translate="for_missing_beds">por falta de leito hospitalar</span><br>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div id="stage_container" class="border rounded border-dark" style="min-height: 500px;"></div>
+            </div>
+            <div class="col-sm-6">
+              <canvas id="chart" width="400" height="400">Your browser is not compatible</canvas>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <h6><span data-translate="quarantine">Quarentena</span> (<span id="total_in_quarantine"></span> <span data-translate="people">pessoas</span>)</h6>
+              <div id="stage_quarantine_container" class="border rounded border-dark" style="min-height: 100px;"></div>
+            </div>
+            <div class="col-sm-4">
+              <h6><span data-translate="intensive_care">Hospitalizados</span> (<span id="total_in_intensive_care"></span> / <span id="max_total_in_intensive_care"></span> <span data-translate="people">pessoas</span>)</h6>
+              <div id="stage_intensive_care_container" class="border rounded border-dark" style="min-height: 100px;"></div>
+            </div>
+            <div class="col-sm-4">
+              <h6><span data-translate="Dead">Mortos</span></h6>
+              <div id="stage_dead_container" class="border rounded border-dark" style="min-height: 100px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <h5><span data-translate="simulation_parameters">Parâmetros da Simulação</span></h5>
+        </div>
+        <div class="row mb-5">
+          <form class="col-sm-12" id="control_form">
+            <div class="form-group row">
+              <div class="col-sm-4">
+                <label for="control_initial_population" data-translate="simulation_initial_population">População Inicial</label>
+                <input type="number" id="control_initial_population" class="form-control" aria-describedby="control_initial_population_help">
+                <small id="control_initial_population_help" class="form-text text-muted" data-translate="simulation_initial_population_help">
+                  Número total de pessoas da população
+                </small>
+              </div>
+              <div class="col-sm-4">
+                <label for="control_initial_infected" data-translate="simulation_initial_infected">Infectados iniciais</label>
+                <input type="number" id="control_initial_infected" class="form-control" aria-describedby="control_initial_infected_help">
+                <small id="control_initial_infected_help" class="form-text text-muted" data-translate="simulation_initial_infected_help">
+                  Número inicial de infectados
+                </small>
+              </div>
+              <div class="col-sm-4">
+                <label for="control_people_speed" data-translate="simulation_people_speed">Mobilidade </label>: <span id="control_people_speed_text"></span>%</label>
+                <input type="range" id="control_people_speed" class="form-control-range" aria-describedby="control_people_speed_help">
+                <small id="control_people_speed_help" class="form-text text-muted" data-translate="simulation_people_speed_help">
+                  Porcentagem da mobilidade da população.<br>
+                  Ao diminuir a mobilidade, simula-se o efeito de ficar em casa.
+                </small>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-4">
+                <label for="control_desease_duration" data-translate="simulation_desease_duration">Duração da doença</label>
+                <input type="number" id="control_desease_duration" class="form-control" aria-describedby="control_desease_duration_help">
+                <small id="control_desease_duration_help" class="form-text text-muted" data-translate="simulation_desease_duration_help">
+                  Dias em que mantém infectado até ser curado ou morrer
+                </small>
+              </div>
+              <div class="col-sm-4">
+                <label for="control_infection_rate"><span data-translate="simulation_infection_rate">Taxa de infecção</span>: <span id="control_infection_rate_text"></span>%</label>
+                <input type="range" id="control_infection_rate" class="form-control-range" aria-describedby="control_infection_rate_help">
+                <small id="control_infection_rate_help" class="form-text text-muted" data-translate="simulation_infection_rate_help">
+                  A probabilidade de uma pessoa infectada transmitir e infectar outra pessoa próxima
+                </small>
+              </div>
+              <div class="col-sm-4">
+                <label for="control_lethality_rate"><span data-translate="simulation_lethality">Letalidade</span>: <span id="control_lethality_rate_text"></span>%</label>
+                <input type="range" id="control_lethality_rate" class="form-control-range" aria-describedby="control_lethality_rate_help">
+                <small id="control_lethality_rate_help" class="form-text text-muted" data-translate="simulation_lethality_help">
+                  A probabilidade de um infectado morrer
+                </small>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-4">
+                  <label class="checkbox-quarantine"> Ativar Quarentena
+                      <input type="checkbox" id="check-quarantine" checked="checked">
+                      <span class="checkmark"></span>
+                  </label>
+                <!-- <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="control_quarantine">
+                  <label class="custom-control-label" for="control_quarantine" data-translate="simulation_activate_quarantine">Ativar Quarentena</label>
+                </div> -->
+              </div>
+              <div class="col-sm-4">
+                <label for="control_desease_duration" data-translate="simulation_days_before_quarantine">Dias antes da quarentena</label>
+                <input type="number" id="control_days_to_quarantine" class="form-control" aria-describedby="control_desease_duration_help">
+                <small id="control_desease_duration_help" class="form-text text-muted" data-translate="simulation_days_before_quarantine_help">
+                  Dias até aparecerem os sintomas e o indivíduo entrar em quarentena.
+                </small>
+              </div>
+              <div class="col-sm-4">
+                <label for="control_asymptomatic_rate"><span data-translate="simulation_asymptomatic_rate">Taxa sem isolamento</span>: <span id="control_asymptomatic_rate_text"></span>%</label>
+                <input type="range" id="control_asymptomatic_rate" class="form-control-range" aria-describedby="control_asymptomatic_rate_help">
+                <small id="control_asymptomatic_rate_help" class="form-text text-muted" data-translate="simulation_asymptomatic_rate_help">
+                  Porcentagem de pessoas, entre as que pegaram o vírus e não ficarão em quarentena
+                </small>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-4">
+                <label for="control_intensive_care_rate"><span data-translate="simulation_icu_rate">Taxa de internação</span>: <span id="control_intensive_care_rate_text"></span>%</label>
+                <input type="range" id="control_intensive_care_rate" class="form-control-range" aria-describedby="control_intensive_care_rate_help">
+                <small id="control_intensive_care_rate_help" class="form-text text-muted" data-translate="simulation_icu_rate_help">
+                  Porcentagem de pessoas infectadas que necessitam de internação
+                </small>
+              </div>
+              <div class="col-sm-4">
+                <label for="control_intensive_care_beds" data-translate="simulation_icu_every_100">Número de leitos por 100 pessoas</label>
+                <input type="number" id="control_intensive_care_beds" class="form-control" aria-describedby="control_intensive_care_beds_help">
+                <small id="control_intensive_care_beds_help" class="form-text text-muted" data-translate="simulation_icu_every_100_help">
+                  Exemplo: Se são 2 leitos para 200 pessoas, inserir "1" (1 leito para 100 pessoas).<br>Se não há nenhum leito disponível, pessoas que necessitarem de leitos irão falecer.
+                </small>
+              </div>
+            </div>
+          </form>
+        </div>
+    
+      </main>
+      <script src="https://anapdinizm.github.io/simulator/src/js/plugins/jquery-3.4.1.min.js"></script> <!--/assets/js/vendor/jquery/jquery-1.12.4.min.js-->
+      <script src="https://getbootstrap.com/docs/4.0/dist/js/bootstrap.min.js"></script>
+      <script src="https://anapdinizm.github.io/simulator/src/js/header.js"></script>
+      <script src="https://anapdinizm.github.io/simulator/src/js/index.js"></script>
+      <script src="https://anapdinizm.github.io/simulator/src/js/listeners.js"></script>
+      <script src="https://anapdinizm.github.io/simulator/src/js/chart.js"></script>
+</html>
