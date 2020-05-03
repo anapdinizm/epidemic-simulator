@@ -45,7 +45,7 @@ document.getElementById('control_initial_infected').addEventListener('change', f
 /* Infection rate */
 document.getElementById('control_infection_rate').addEventListener('input', function (e) {
     infectionRate = this.value / 100;
-    document.getElementById('control_infection_rate_text').innerHTML = Math.round(infectionRate * 100);
+    document.getElementById('control_infection_rate_text').innerHTML = infectionRate;
 });
 
 /* Desease duration */
@@ -56,7 +56,7 @@ document.getElementById('control_desease_duration').addEventListener('change', f
 /* Lethality rate */
 document.getElementById('control_lethality_rate').addEventListener('input', function (e) {
     lethalityRate = this.value / 100;
-    document.getElementById('control_lethality_rate_text').innerHTML = Math.round(lethalityRate * 100);
+    document.getElementById('control_lethality_rate_text').innerHTML = lethalityRate;
 });
 
 /* Quarantine activation */
@@ -146,12 +146,12 @@ document.getElementById('control_people_speed').value = maxVelocity * 100 / 6;
 document.getElementById('control_people_speed_text').innerHTML = maxVelocity * 100 / 6;
 
 document.getElementById('control_infection_rate').value = infectionRate * 100;
-document.getElementById('control_infection_rate_text').innerText = infectionRate * 100;
+document.getElementById('control_infection_rate_text').innerText = infectionRate;
 
 document.getElementById('control_desease_duration').value = infectionDuration;
 
 document.getElementById('control_lethality_rate').value = lethalityRate * 100;
-document.getElementById('control_lethality_rate_text').innerHTML = lethalityRate * 100;
+document.getElementById('control_lethality_rate_text').innerHTML = lethalityRate;
 
 document.getElementById('check-quarantine').checked = quarantineActivated;
 
